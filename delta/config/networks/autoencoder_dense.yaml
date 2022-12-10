@@ -1,0 +1,12 @@
+layers:
+  - Input:
+      shape: [8, 8, 3]
+  - Flatten:
+  - Dense:
+      units: 300
+      activation: relu
+  - Dense:
+      units: 192
+      activation: relu
+  - Reshape:
+      target_shape: [8, 8, 3]

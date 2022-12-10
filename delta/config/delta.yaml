@@ -1,0 +1,129 @@
+general:
+  # negative is all
+  gpus:              -1
+  # print more debug information
+  verbose: false
+  extensions:
+    - delta.extensions
+
+io:
+  threads:           ~
+  # size of tile to load into memory at a time as [rows, columns]
+  tile_size:         [256, 1024]
+  interleave_blocks:  16
+  cache:
+    # default is OS-specific, in Linux, ~/.cache/delta
+    dir:              default
+    limit:            8
+
+dataset:
+  images:
+    type:             tiff
+    # preprocess the images when loading (i.e., scaling)
+    preprocess:
+      - scale
+    nodata_value:     ~
+    directory:        ~
+    extension:        default
+    file_list:        ~
+    files:            ~
+  
+  labels:
+    type:             tiff
+    preprocess:       ~
+    nodata_value:     ~
+    directory:        ~
+    extension:        default
+    file_list:        ~
+    files:            ~
+
+  # can either be a list of classes or the number of classes,
+  # if the labels are 0, 1, 2, 3
+  classes:            4
+  # labels are 1, 2, 3, 4; with names and display colors
+  # weight is optional, but required for either all or none
+  #classes:
+  #  - 1:
+  #      name: Water
+  #      color: 0x67a9cf
+  #      weight: 5.0
+  #  - 2:
+  #      name: No Water
+  #      color: 0xf6eff7
+  #      weight: 1.0
+  #  - 3:
+  #      name: Maybe Water
+  #      color: 0xbdc9e1
+  #      weight: 1.0
+  #  - 4:
+  #      name: Cloud
+  #      color: 0x02818a
+  #      weight: 1.0
+
+train:
+  network:
+    yaml_file:     networks/convpool.yaml
+    params:        ~
+    layers:        ~
+  stride:    ~
+  batch_size:      500
+  steps:           ~ # number of batches in an epoch (~for dataset size)
+  epochs:          5
+  max_tile_offset: ~
+  loss:   sparse_categorical_crossentropy
+  metrics:
+    - sparse_categorical_accuracy
+  optimizer:
+    Adam:
+      learning_rate: 0.001
+  callbacks:       ~
+  # augmentation functions to apply to training data
+  augmentations:   ~
+  disable_mixed_precision: false
+  validation:
+    # if true, skips the first steps from the training set to use for validation instead
+    from_training: true
+    # ignored if from_training is false
+    steps:         1000
+    # otherwise uses the first samples from this dataset:
+    images:
+      type:        tiff
+      preprocess:
+        - scale
+      nodata_value: ~
+      directory:   ~
+      extension:   default
+      file_list:   ~
+      files:       ~
+    labels:
+      type:        tiff
+      preprocess:  ~
+      nodata_value: ~
+      directory:   ~
+      extension:   default
+      file_list:   ~
+      files:       ~
+
+classify:
+  prob_image: true
+  overlap: 0
+  regions: ~
+  metrics: ~
+  wkt_dir: ~
+
+mlflow:
+  # default to ~/.local/share/delta/mlflow
+  enabled:        true
+  uri:            default
+  # rate in epochs to save metrics
+  frequency:      10000
+  experiment_name: Default
+  # rate in batches to save model checkpoints
+  checkpoints:
+    frequency:          1
+    only_save_latest:   true
+
+tensorboard:
+  enabled:        false
+  # default to ~/.local/share/delta/tensorboard
+  dir:            default
